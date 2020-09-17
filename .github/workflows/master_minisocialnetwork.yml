@@ -21,7 +21,7 @@ jobs:
         java-version: '11'
 
     - name: Build with Ant
-      run: md build
+      run: md build\jar
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
@@ -29,4 +29,5 @@ jobs:
         app-name: 'minisocialnetwork'
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_973ec0c91f75449eb218b0240248bad9 }}
-        package: '${{ github.workspace }}/*.war'
+        package: '${{ github.workspace }}/target/*.jar'
+    - task: PublishBuildArtifacts@1
