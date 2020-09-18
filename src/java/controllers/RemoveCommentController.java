@@ -3,27 +3,43 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package services;
+package controllers;
 
+import daos.PostDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.NoSuchAlgorithmException;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Vo Tan Tai
  */
-public class SendEmail extends HttpServlet {
+@WebServlet(name = "RemoveCommentController", urlPatterns = {"/RemoveCommentController"})
+public class RemoveCommentController extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(RemoveCommentController.class);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-
+            try {
+                int id = Integer.parseInt(request.getParameter("txtId"));
+                PostDAO dao = new PostDAO();
+                boolean result = dao.deleteComment(id);
+                if (result) {
+                    out.print("Success");
+                } else {
+                    out.print("Error");
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error at RemoveCommentController: " + e.toString());
+            }
         }
     }
 

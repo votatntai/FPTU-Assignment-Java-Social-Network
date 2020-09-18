@@ -24,6 +24,11 @@ public class Post {
     public Post() {
     }
 
+    public Post(int like, int dislike) {
+        this.like = like;
+        this.dislike = dislike;
+    }
+
     public Post(String title, String content, String image, String email) {
         this.title = title;
         this.content = content;
@@ -49,7 +54,7 @@ public class Post {
         this.email = email;
         this.date = date;
     }
-    
+
     public Post(int id, String title, String content, String image, int like, int dislike, String email, String date, boolean status) {
         this.id = id;
         this.title = title;

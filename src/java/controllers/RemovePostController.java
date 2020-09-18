@@ -5,9 +5,7 @@
  */
 package controllers;
 
-import com.google.gson.JsonObject;
 import daos.PostDAO;
-import entities.Post;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -21,39 +19,26 @@ import org.apache.log4j.Logger;
  *
  * @author Vo Tan Tai
  */
-@WebServlet(name = "DislikeController", urlPatterns = {"/DislikeController"})
-public class DislikeController extends HttpServlet {
-
-    private static final Logger LOGGER = Logger.getLogger(LikeController.class);
-
+@WebServlet(name = "RemovePostController", urlPatterns = {"/RemovePostController"})
+public class RemovePostController extends HttpServlet {
+    
+    private static final Logger LOGGER = Logger.getLogger(RemovePostController.class);
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            JsonObject res = null;
             try {
-                String email = request.getParameter("txtEmail");
-                int id = Integer.parseInt(request.getParameter("txtPostId"));
+                int id = Integer.parseInt(request.getParameter("txtId"));
                 PostDAO dao = new PostDAO();
-                if (dao.isExpressed(email, id)) {
-                    if (dao.isDisliked(email, id)) {
-                        dao.updateEmotion(email, id, 0);
-                    } else {
-                        dao.updateEmotion(email, id, -1);
-                    }
+                boolean result = dao.deletePost(id);
+                if (result) {
+                    out.print("Success");
                 } else {
-                    dao.dislikePost(email, id);
-                }
-                Post post = dao.getPostById(id);
-                if (post != null) {
-                    res = new JsonObject();
-                    res.addProperty("likes", post.getLike());
-                    res.addProperty("dislikes", post.getDislike());
+                    out.print("Error");
                 }
             } catch (Exception e) {
-                LOGGER.error("Error at DislikeController: " + e.toString());
-            } finally {
-                out.print(res);
+                LOGGER.error("Error at RemovePostController: " + e.toString());
             }
         }
     }

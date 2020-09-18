@@ -5,8 +5,12 @@
  */
 package controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import daos.PostDAO;
+import entities.Post;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,16 +30,32 @@ public class LikeController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        int id = 0;
-        try {
-            String email = request.getParameter("txtEmail");
-            id = Integer.parseInt(request.getParameter("txtPostId"));
-            PostDAO dao = new PostDAO();
-            dao.likePost(email, id);
-        } catch (Exception e) {
-            LOGGER.error("Error at SearchController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher("PostDetails?txtId=" + id).forward(request, response);
+        try (PrintWriter out = response.getWriter()) {
+            JsonObject res = null;
+            try {
+                String email = request.getParameter("txtEmail");
+                int id = Integer.parseInt(request.getParameter("txtPostId"));
+                PostDAO dao = new PostDAO();
+                if (dao.isExpressed(email, id)) {
+                    if (dao.isLiked(email, id)) {
+                        dao.updateEmotion(email, id, 0);
+                    } else {
+                        dao.updateEmotion(email, id, 1);
+                    }
+                } else {
+                    dao.likePost(email, id);
+                }
+                Post post = dao.getPostById(id);
+                if (post != null) {
+                    res = new JsonObject();
+                    res.addProperty("likes", post.getLike());
+                    res.addProperty("dislikes", post.getDislike());
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error at LikeController: " + e.toString());
+            } finally {
+                out.print(res);
+            }
         }
     }
 

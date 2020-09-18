@@ -13,9 +13,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap" rel="stylesheet">
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Fakebook</a>
+                <a class="navbar-brand text-primary font-weight-bold" href="LogoutController">Fakebook</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -25,19 +25,19 @@
                         <li class="nav-item active">
                             <form action="SearchController" class="form-inline" method="POST">
                                 <input type="hidden" name="txtPageNumber" value="1">
-                                <input class="form-control mr-sm-2" type="search" name="txtSearch" placeholder="Search" aria-label="Search">
-                                <button class="btn btn-outline-light" type="submit">Search</button>
+                                <input class="form-control mr-sm-2 my-1" type="search" name="txtSearch" placeholder="Search" aria-label="Search">
+                                <button class="btn btn-outline-primary my-1" type="submit">Search</button>
                             </form>
                         </li>
                     </ul>
                     <c:if test="${sessionScope.USER == null}">
                         <div class="form-inline my-2 my-lg-0">
-                            <a class="btn btn-outline-light px-5" href="login.jsp">Login</a>
+                            <a class="btn btn-outline-primary px-5" href="login.jsp">Login</a>
                         </div>
                     </c:if>
                     <c:if test="${sessionScope.USER != null}">
                         <div class="form-inline my-2 my-lg-0">
-                            <a class="btn btn-outline-light px-5" href="index.jsp">${sessionScope.USER.name}</a>
+                            <a class="btn btn-outline-primary px-5" href="index.jsp">${sessionScope.USER.name}</a>
                         </div>
                     </c:if>
                 </div>

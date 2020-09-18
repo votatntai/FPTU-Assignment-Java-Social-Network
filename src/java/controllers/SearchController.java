@@ -29,7 +29,7 @@ public class SearchController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        int rowOfPage = 5;
+        int rowOfPage = 3;
         try {
             String search = request.getParameter("txtSearch");
             String pageNumber = request.getParameter("txtPageNumber");
@@ -38,7 +38,6 @@ public class SearchController extends HttpServlet {
                 PostDAO dao = new PostDAO();
                 List<Post> list = dao.searchPostByContent(search, page, rowOfPage);
                 request.setAttribute("RESULT", list);
-                System.out.println(list.size());
             }
         } catch (Exception e) {
             LOGGER.error("Error at SearchController: " + e.toString());

@@ -66,12 +66,13 @@ public class PostDAO {
             rs = stm.executeQuery();
             list = new ArrayList<>();
             while (rs.next()) {
+                String[] date = rs.getString("Date").split(" ");
                 post = new Post(rs.getInt("Id"),
                         rs.getString("Title"),
                         rs.getString("Content"),
                         rs.getString("Image"),
                         rs.getString("Email"),
-                        rs.getString("Date"));
+                        date[0]);
                 list.add(post);
             }
         } finally {
@@ -102,6 +103,19 @@ public class PostDAO {
             closeConnection();
         }
         return post;
+    }
+
+    public boolean deletePost(int postId) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("{Call DeletePost(?)}");
+            stm.setInt(1, postId);
+            result = stm.executeUpdate() > 0;
+        } finally {
+            closeConnection();
+        }
+        return result;
     }
 
     public List<Comment> getComment(int id) throws SQLException, NamingException {
@@ -149,13 +163,12 @@ public class PostDAO {
         return result;
     }
 
-    public boolean likePost(String email, int postId) throws SQLException, NamingException {
+    public boolean deleteComment(int commentId) throws SQLException, NamingException {
         boolean result = false;
         try {
             conn = MyConnection.getConnection();
-            stm = conn.prepareCall("{Call LikePost(?, ?)}");
-            stm.setString(1, email);
-            stm.setInt(2, postId);
+            stm = conn.prepareCall("{Call DeleteComment(?)}");
+            stm.setInt(1, commentId);
             result = stm.executeUpdate() > 0;
         } finally {
             closeConnection();
@@ -163,14 +176,96 @@ public class PostDAO {
         return result;
     }
 
-    public boolean disLikePost(String email, int postId) throws SQLException, NamingException {
+    public boolean likePost(String email, int postId) throws SQLException, NamingException {
         boolean result = false;
         try {
             conn = MyConnection.getConnection();
-            stm = conn.prepareCall("{Call DislikePost(?, ?)}");
+            stm = conn.prepareCall("{Call ExpressEmotion(?, ?, ?)}");
             stm.setString(1, email);
             stm.setInt(2, postId);
+            stm.setInt(3, 1);
             result = stm.executeUpdate() > 0;
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean dislikePost(String email, int postId) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("{Call ExpressEmotion(?, ?, ?)}");
+            stm.setString(1, email);
+            stm.setInt(2, postId);
+            stm.setInt(3, -1);
+            result = stm.executeUpdate() > 0;
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean updateEmotion(String email, int postId, int emotion) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("{Call UpdateEmotion(?, ?, ?)}");
+            stm.setString(1, email);
+            stm.setInt(2, postId);
+            stm.setInt(3, emotion);
+            result = stm.executeUpdate() > 0;
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean isExpressed(String email, int postId) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("Select Type From Emotions Where Email = ? And PostId = ?");
+            stm.setString(1, email);
+            stm.setInt(2, postId);
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                result = true;
+            }
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean isLiked(String email, int postId) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("Select Type From Emotions Where Email = ? And PostId = ? And Type = 1");
+            stm.setString(1, email);
+            stm.setInt(2, postId);
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                result = true;
+            }
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean isDisliked(String email, int postId) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareCall("Select Type From Emotions Where Email = ? And PostId = ? And Type = -1");
+            stm.setString(1, email);
+            stm.setInt(2, postId);
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                result = true;
+            }
         } finally {
             closeConnection();
         }

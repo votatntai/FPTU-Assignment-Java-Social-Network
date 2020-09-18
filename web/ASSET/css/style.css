@@ -7,6 +7,11 @@ and open the template in the editor.
     Created on : Sep 14, 2020, 5:18:20 PM
     Author     : Vo Tan Tai
 */
+
+::-webkit-scrollbar {
+    width: 0;
+}
+
 body {
     font-family: 'Roboto Condensed', sans-serif;
     background: #e6e6e6;
@@ -20,3 +25,13 @@ a:hover {
     border-radius: 10px;
 }
 
+.text-limit {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.line-height-1 {
+    line-height: 1;
+}

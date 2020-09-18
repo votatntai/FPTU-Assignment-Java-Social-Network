@@ -63,17 +63,13 @@ public class UserDAO {
         int status = 0;
         try {
             conn = MyConnection.getConnection();
-            if (!checkEmailExit(register.getEmail())) {
-                stm = conn.prepareCall("{Call Register(?, ?, ?)}");
-                stm.setString(1, register.getEmail());
-                stm.setString(2, register.getPassword());
-                stm.setString(3, register.getName());
-                boolean result = stm.executeUpdate() > 0;
-                if (result) {
-                    status = 1;
-                }
-            } else {
-                status = 2;
+            stm = conn.prepareCall("{Call Register(?, ?, ?)}");
+            stm.setString(1, register.getEmail());
+            stm.setString(2, register.getPassword());
+            stm.setString(3, register.getName());
+            boolean result = stm.executeUpdate() > 0;
+            if (result) {
+                status = 1;
             }
         } finally {
             closeConnection();
@@ -81,13 +77,32 @@ public class UserDAO {
         return status;
     }
 
-    public boolean checkEmailExit(String email) throws SQLException {
+    public boolean verifyAccount(String email) throws SQLException, NamingException {
         boolean result = false;
-        stm = conn.prepareStatement("Select Email From Users Where Email = ?");
-        stm.setString(1, email);
-        rs = stm.executeQuery();
-        if (rs.next()) {
-            result = true;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareStatement("Update Users Set Status = ? Where Email = ?");
+            stm.setString(1, "Confirmed");
+            stm.setString(2, email);
+            result = stm.executeUpdate() > 0;
+        } finally {
+            closeConnection();
+        }
+        return result;
+    }
+
+    public boolean checkEmailExit(String email) throws SQLException, NamingException {
+        boolean result = false;
+        try {
+            conn = MyConnection.getConnection();
+            stm = conn.prepareStatement("Select Email From Users Where Email = ?");
+            stm.setString(1, email);
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                result = true;
+            }
+        } finally {
+            closeConnection();
         }
         return result;
     }
@@ -102,10 +117,25 @@ public class UserDAO {
             list = new ArrayList<>();
             Notice notice;
             while (rs.next()) {
+                String content;
+                switch (rs.getString("Content")) {
+                    case "1":
+                        content = "đã thích bài viết của bạn";
+                        break;
+                    case "-1":
+                        content = "đã không thích bài viết của bạn";
+                        break;
+                    case "0":
+                        content = "đã hủy bài tỏ cảm xúc về bài viết của bạn";
+                        break;
+                    default:
+                        content = rs.getString("Content");
+                        break;
+                }
                 notice = new Notice(rs.getInt("Id"),
                         rs.getString("Email"),
                         rs.getInt("PostId"),
-                        rs.getString("Content"),
+                        content,
                         rs.getString("Date"));
                 list.add(notice);
             }

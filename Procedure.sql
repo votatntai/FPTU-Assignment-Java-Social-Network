@@ -5,7 +5,7 @@ Create Proc CheckLogin
 @password nvarchar(256)
 As
 Begin
-	Select Email, Name, Role, Status From Users Where Email = @email And Password = @password
+	Select Email, Name, Role, Status From Users Where Email = @email And Password = @password And Status = 'Confirmed'
 End
 Go
 Create Proc Register
@@ -27,13 +27,13 @@ Begin
 	Insert Into Posts (Title, Content, Image, Email) Values (@title, @content, @image, @email)
 End
 Go
-Alter Proc GetPostById
+Create Proc GetPostById
 @postId int
 As
 Begin
 	Select Title, Content, Image, 
-	(Select COUNT(Email) From Likes Where PostId = @postId) As Likes, 
-	(Select COUNT(Email) From Dislikes Where PostId = @postId) As Dislikes, 
+	(Select COUNT(Email) From Emotions Where PostId = @postId And Type = 1) As Likes, 
+	(Select COUNT(Email) From Emotions Where PostId = @postId And Type = -1) As Dislikes, 
 	Email, Date From Posts 
 	Where Id = @postId And Status = 1
 End
@@ -50,24 +50,24 @@ Begin
 	FETCH NEXT @rowsOfPage ROWS ONLY
 End
 Go
-Create Proc LikePost
+Create Proc ExpressEmotion
 @email nvarchar(256),
-@postId int
+@postId int,
+@emotion int = 0
 As
 Begin
-	Insert Into Likes (Email, PostId) Values (@email, @postId)
-	Delete From Dislikes Where Email = @email And PostId = @postId
-	Insert Into Notices (Email, PostId, Content, Author) Values (@email, @postId, N'đã thích bài viết của bạn', (Select Email From Posts Where Posts.Id = @postId))
+	Insert Into Emotions (Email, PostId, Type) Values (@email, @postId, @emotion)
+	Insert Into Notices (Email, PostId, Content, Author) Values (@email, @postId, @emotion, (Select Email From Posts Where Posts.Id = @postId))
 End
 Go
-Create Proc DislikePost
+Create Proc UpdateEmotion
 @email nvarchar(256),
-@postId int
+@postId int,
+@emotion int = 0
 As
 Begin
-	Insert Into Dislikes (Email, PostId) Values (@email, @postId)
-	Delete From Likes Where Email = @email And PostId = @postId
-	Insert Into Notices (Email, PostId, Content, Author) Values (@email, @postId, N'đã không thích bài viết của bạn', (Select Email From Posts Where Posts.Id = @postId))
+	Update Emotions Set Type = @emotion Where Email = @email and PostId = @postId
+	Insert Into Notices (Email, PostId, Content, Author) Values (@email, @postId, @emotion, (Select Email From Posts Where Posts.Id = @postId))
 End
 Go
 Create Proc GetNotice
@@ -75,4 +75,18 @@ Create Proc GetNotice
 As
 Begin
 	Select Id, Email, PostId, Content, Date From Notices Where Author = @email Order By Date DESC
+End
+Go
+Create Proc DeletePost
+@postId int
+As
+Begin
+	Update Posts Set Status = 0 Where Id = @postId
+End
+Go
+Create Proc DeleteComment
+@commentId int
+As
+Begin
+	Delete From Comments Where Id = @commentId
 End
