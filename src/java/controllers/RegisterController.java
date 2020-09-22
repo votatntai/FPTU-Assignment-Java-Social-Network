@@ -75,7 +75,7 @@ public class RegisterController extends HttpServlet {
                         }
                     } else {
                         out.print("Duplicate");
-                    }
+                    }   
                 } else {
                     out.print("Password does not match");
                 }

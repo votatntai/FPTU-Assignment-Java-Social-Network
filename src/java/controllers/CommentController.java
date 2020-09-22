@@ -5,9 +5,14 @@
  */
 package controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import daos.PostDAO;
 import entities.Comment;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.AbstractList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,23 +31,30 @@ public class CommentController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("application/json");
         request.setCharacterEncoding("UTF-8");
-        String url = "login.jsp";
-        int id = Integer.parseInt(request.getParameter("txtPostId"));
-        try {
-            String email = request.getParameter("txtEmail");
-            String content = request.getParameter("txtContent");
-            if (email != null) {
-                Comment comment = new Comment(email, content, id);
-                PostDAO dao = new PostDAO();
-                dao.createComment(comment);
-                url = "PostDetails?txtId=" + id;
+        try (PrintWriter out = response.getWriter()) {
+            String json = "";
+            try {
+                int id = Integer.parseInt(request.getParameter("txtPostId"));
+                String email = request.getParameter("txtEmail");
+                String content = request.getParameter("txtContent");
+                if (email != null) {
+                    Comment comment = new Comment(email, content, id);
+                    PostDAO dao = new PostDAO();
+                    int result = dao.createComment(comment);
+                    if (result > 0) {
+                        List<Comment> list = dao.getComment(id);
+                        Gson comments = new Gson();
+                        json = comments.toJson(list);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error at CommentController: " + e.toString());
+            } finally {
+                out.print(json);
+                out.close();
             }
-        } catch (Exception e) {
-            LOGGER.error("Error at CommentController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
         }
     }
 

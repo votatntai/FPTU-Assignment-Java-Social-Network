@@ -10,7 +10,6 @@ function readURL(input) {
 $("#upload").change(function () {
     readURL(this);
 });
-
 $(function () {
     let form = $("#form-login");
     form.on('submit', function (e) {
@@ -44,7 +43,6 @@ $(function () {
         });
     });
 });
-
 $(function () {
     let form = $("#form-register");
     form.on('submit', function (e) {
@@ -84,7 +82,6 @@ $(function () {
         });
     });
 });
-
 $(function () {
     let form = $("#form-create-post");
     form.on('submit', function (e) {
@@ -123,7 +120,6 @@ $(function () {
         });
     });
 });
-
 $(function () {
     let form = $("#form-verify");
     form.on('submit', function (e) {
@@ -157,7 +153,6 @@ $(function () {
         });
     });
 });
-
 $(function () {
     let form = $("#delete-post");
     form.on('submit', function (e) {
@@ -207,7 +202,6 @@ $(function () {
         })
     });
 });
-
 $(function () {
     let form = $(".delete-comment");
     form.on('submit', function (e) {
@@ -236,10 +230,10 @@ $(function () {
                                 text: 'An unknown error when deleting comment, please contact the administrator',
                             });
                         } else if (res === "Success") {
-                            comment.parents(".card-body").fadeOut(1000);
+                            comment.parents(".card-body").fadeOut(500);
                             setTimeout(function () {
                                 comment.parents(".card-body").remove();
-                            }, 1000);
+                            }, 500);
                         }
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -254,7 +248,6 @@ $(function () {
         })
     });
 });
-
 $(function () {
     let form = $(".form-reaction");
     form.on('submit', function (e) {
@@ -266,9 +259,9 @@ $(function () {
             url: url,
             data: data,
             success: function (res) {
-                var post = JSON.parse(res);
-                $('#likes').html(post.likes);
-                $('#dislikes').html(post.dislikes);
+                console.log()
+                $('#likes').html(res.likes);
+                $('#dislikes').html(res.dislikes);
             },
             error: function (jqXHR, textStatus, errorThrown) {
             }

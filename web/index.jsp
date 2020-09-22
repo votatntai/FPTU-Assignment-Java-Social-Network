@@ -30,7 +30,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="view text-center">
-                        <img class="rounded" src="" id="show-image" alt="" width="250">
+                        <img class="rounded" src="ASSET/img/default.jpg" id="show-image" alt="" width="250">
                     </div>
                 </div>
             </div>

@@ -39,10 +39,10 @@
                         <input type="hidden" name="txtPostId" value="${requestScope.POST.id}">
                         <button type="submit" class="btn btn-outline-primary mr-3"><i class="far fa-thumbs-down"></i></button>
                     </form>
-                        <p class="d-inline float-right"><span class="text-primary" id="likes">${requestScope.POST.like}</span> Like and <span class="text-primary" id="dislikes">${requestScope.POST.dislike}</span> Dislike</p>
+                    <p class="d-inline float-right"><span class="text-primary" id="likes">${requestScope.POST.like}</span> Like and <span class="text-primary" id="dislikes">${requestScope.POST.dislike}</span> Dislike</p>
                 </div>
                 <div class="card-footer">
-                    <form action="CommentController" method="POST">
+                    <form action="CommentController" method="POST" id="form-comment">
                         <input type="hidden" name="txtPostId" value="${requestScope.POST.id}">
                         <c:if test="${sessionScope.USER != null}">
                             <input type="hidden" name="txtEmail" value="${sessionScope.USER.email}">
@@ -52,26 +52,28 @@
                         </div>
                         <input type="submit" class="btn btn-primary text-right" name="action" value="Comment">
                     </form>
-                    <c:if test="${requestScope.COMMENTS != null}">
-                        <c:forEach var="comment" items="${requestScope.COMMENTS}">
-                            <div class="card-body">
-                                <div class="card p-3">
-                                    <div class="d-block">
-                                        <c:if test="${comment.email.equals(sessionScope.USER.email)}">
-                                            <form class="delete-comment d-inline" action="RemoveCommentController" method="POST">
-                                                <input type="hidden" name="txtId" value="${comment.id}">
-                                                <button class="btn btn-sm btn-outline-danger float-right line-height-1" type="submit">x</button>
-                                            </form>
-                                        </c:if>
-                                        <div class="w-75">
-                                            <span class="font-weight-bold text-primary">${comment.email}</span>
-                                            <span>${comment.content}</span>
+                    <div class="render-comment">
+                        <c:if test="${requestScope.COMMENTS != null}">
+                            <c:forEach var="comment" items="${requestScope.COMMENTS}">
+                                <div class="card-body">
+                                    <div class="card p-3">
+                                        <div class="d-block">
+                                            <c:if test="${comment.email.equals(sessionScope.USER.email)}">
+                                                <form class="delete-comment d-inline" action="RemoveCommentController" method="POST">
+                                                    <input type="hidden" name="txtId" value="${comment.id}">
+                                                    <button class="btn btn-sm btn-outline-danger float-right line-height-1" type="submit">x</button>
+                                                </form>
+                                            </c:if>
+                                            <div class="w-75">
+                                                <span class="font-weight-bold text-primary">${comment.email}</span>
+                                                <span>${comment.content}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </c:forEach>
-                    </c:if>
+                            </c:forEach>
+                        </c:if>
+                    </div>
                 </div>
             </div>
         </c:if>
